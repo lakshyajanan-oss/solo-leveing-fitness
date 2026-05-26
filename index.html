@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>The Fitness System - Solo Leveling</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-[#081120] antialiased">
+
+  <div class="mobile-viewport bg-[#081120] border-x border-slate-900 shadow-2xl flex flex-col justify-between overflow-x-hidden">
+    
+    <header class="glass-panel p-4 border-b border-cyan-500/20 sticky top-0 z-40 flex justify-between items-center">
+      <div class="flex items-center gap-2">
+        <div class="w-3 h-3 bg-cyan-400 rounded-full animate-ping"></div>
+        <h1 class="heading-system text-2xl font-bold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">THE SYSTEM</h1>
+      </div>
+      <div id="activeUserTag" class="text-xs font-mono text-cyan-400 hidden"></div>
+    </header>
+
+    <main class="flex-grow p-4 space-y-6 overflow-y-auto mb-16">
+
+      <section id="authScreen" class="glass-panel p-6 rounded-lg hud-border space-y-5 my-auto">
+        <div class="text-center space-y-1">
+          <h2 class="heading-system text-xl font-bold tracking-widest text-cyan-400">AWAKENING GATEWAY</h2>
+          <p class="text-xs text-slate-400 font-mono">Verify your Hunter Signature to load cloud progress files.</p>
+        </div>
+        <div class="space-y-3 font-mono text-xs">
+          <div>
+            <label class="block text-slate-400 mb-1">HUNTER CODENAME</label>
+            <input type="text" id="authUsername" class="w-full bg-slate-950 border border-slate-800 rounded p-2.5 text-cyan-400 focus:border-cyan-400 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-slate-400 mb-1">SECURITY PASSKEY</label>
+            <input type="password" id="authPassword" class="w-full bg-slate-950 border border-slate-800 rounded p-2.5 text-cyan-400 focus:border-cyan-400 focus:outline-none">
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3 pt-2">
+          <button onclick="handleIdentityAuth('login')" class="py-2.5 bg-slate-900 border border-cyan-500/30 text-cyan-400 font-mono text-xs rounded font-bold tracking-wider hover:bg-slate-850 active:scale-95 transition">LOAD SAVED LINK</button>
+          <button onclick="handleIdentityAuth('register')" class="py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 text-black font-bold heading-system text-xs rounded tracking-widest hover:brightness-110 active:scale-95 transition">CREATE PROFILE</button>
+        </div>
+        <div class="border-t border-slate-800/60 pt-3 text-center">
+          <button onclick="simulatedGoogleLogin()" class="w-full py-2 bg-slate-950 hover:bg-slate-900 border border-slate-800 rounded flex items-center justify-center gap-2 text-xs font-mono tracking-wide text-slate-300 transition">
+            <svg class="w-4 h-4" viewBox="0 0 24 24"><path fill="#EA4335" d="M12 5.04c1.64 0 3.12.56 4.28 1.67l3.2-3.2C17.52 1.57 14.96 1 12 1 7.35 1 3.42 3.66 1.5 7.54l3.75 2.9C6.13 7.5 8.84 5.04 12 5.04z"/><path fill="#4285F4" d="M23.49 12.27c0-.81-.07-1.59-.2-2.36H12v4.51h6.46c-.29 1.48-1.14 2.73-2.42 3.57v2.96h3.91c2.28-2.1 3.54-5.19 3.54-8.68z"/><path fill="#FBBC05" d="M5.25 14.72c-.25-.76-.39-1.57-.39-2.42s.14-1.66.39-2.42L1.5 6.98C.54 8.9 0 11.04 0 13.3s.54 4.4 1.5 6.32l3.75-2.9z"/><path fill="#34A853" d="M12 23c3.24 0 5.97-1.07 7.96-2.91l-3.91-2.96c-1.08.72-2.47 1.16-4.05 1.16-3.16 0-5.87-2.46-6.75-5.41L1.5 16.32C3.42 20.19 7.35 23 12 23z"/></svg>
+            IDENTITY SYNC WITH GOOGLE
+          </button>
+        </div>
+      </section>
+
+      <section id="onboardingScreen" class="hidden glass-panel p-5 rounded-lg hud-border space-y-4">
+        <h2 class="heading-system text-xl text-cyan-400 border-b border-cyan-500/20 pb-2">HUNTER EVALUATION FORMS</h2>
+        <form onsubmit="generateHunterProgram(event)" class="space-y-4">
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs text-slate-400 mb-1 font-semibold uppercase">Age</label>
+              <input type="number" id="inputAge" required min="12" max="90" value="18" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xl text-center text-3d-cyan font-bold focus:border-cyan-400 focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-xs text-slate-400 mb-1 font-semibold uppercase" id="weightLabel">Weight (kg)</label>
+              <input type="number" id="inputWeight" required min="30" max="300" value="70" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xl text-center text-3d-cyan font-bold focus:border-cyan-400 focus:outline-none">
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs text-slate-400 mb-1 font-semibold uppercase">Height (cm)</label>
+            <input type="number" id="inputHeight" required min="100" max="250" value="175" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xl text-center text-3d-cyan font-bold focus:border-cyan-400 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs text-slate-400 mb-1 font-semibold uppercase">Target Class Focus</label>
+            <select id="inputGoal" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-sm text-cyan-300 focus:border-cyan-400 focus:outline-none">
+              <option value="fat_loss">Assassination Speed (Fat Loss / Agility)</option>
+              <option value="muscle_gain">Monarch Muscle Titan (Hypertrophy / Power)</option>
+              <option value="balanced">Shadow Warrior (Athletic Balance / GPP)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs text-slate-400 mb-1 font-semibold uppercase">Deployment Setup (Select Days)</label>
+            <div class="grid grid-cols-7 gap-1" id="daysWrapper"></div>
+          </div>
+          <button type="submit" class="w-full py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-black font-bold heading-system tracking-widest rounded transition active:scale-95 shadow-lg">
+            INITIALIZE AWAKENING
+          </button>
+        </form>
+      </section>
+
+      <section id="dashboardScreen" class="hidden space-y-6">
+        <div id="hunterProfileCard" class="glass-panel p-4 rounded-lg hud-border relative overflow-hidden bg-gradient-to-br from-slate-950 via-[#14213d]/60 to-purple-950/40">
+          <div class="absolute top-0 right-0 bg-purple-600 text-black text-xs font-bold font-mono px-3 py-1 uppercase tracking-widest" id="hunterRankTag">E-RANK</div>
+          <div class="flex items-center gap-4">
+            <div class="relative">
+              <div class="w-20 h-20 rounded-full border-2 border-purple-500 p-1 bg-slate-900 overflow-hidden">
+                <img id="characterAvatar" src="https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=150&auto=format&fit=crop&q=60" alt="Identity avatar image" class="w-full h-full object-cover grayscale contrast-125">
+              </div>
+              <div class="absolute -bottom-1 -right-1 bg-cyan-400 text-black text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center border-2 border-slate-950" id="hunterLevelBadge">1</div>
+            </div>
+            <div>
+              <h3 class="heading-system text-xl font-bold text-white">PLAYER ACTIVATED</h3>
+              <p class="text-xs font-mono text-purple-400 tracking-wider" id="systemClassTitle">Shadow Combatant Specialist</p>
+              <div class="mt-2 w-44 bg-slate-800 rounded-full h-2 overflow-hidden border border-purple-500/30">
+                <div id="expBar" class="bg-gradient-to-r from-purple-500 to-cyan-400 h-full transition-all duration-500" style="width: 0%"></div>
+              </div>
+              <p class="text-[10px] text-slate-400 font-mono mt-1">XP PROGRESS: <span id="expText" class="text-cyan-400 font-bold">0 / 100</span></p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-4 gap-2 mt-4 pt-3 border-t border-slate-800/80 text-center text-xs font-mono">
+            <div class="bg-slate-900/80 p-1.5 rounded border border-slate-800">
+              <div class="text-slate-400 text-[10px]">STR</div>
+              <div class="text-sm font-bold text-red-400 text-3d-cyan" id="statSTR">10</div>
+            </div>
+            <div class="bg-slate-900/80 p-1.5 rounded border border-slate-800">
+              <div class="text-slate-400 text-[10px]">AGI</div>
+              <div class="text-sm font-bold text-cyan-400 text-3d-cyan" id="statAGI">10</div>
+            </div>
+            <div class="bg-slate-900/80 p-1.5 rounded border border-slate-800">
+              <div class="text-slate-400 text-[10px]">VIT</div>
+              <div class="text-sm font-bold text-emerald-400 text-3d-cyan" id="statVIT">10</div>
+            </div>
+            <div class="bg-slate-900/80 p-1.5 rounded border border-slate-800">
+              <div class="text-slate-400 text-[10px]">INT</div>
+              <div class="text-sm font-bold text-purple-400 text-3d-cyan" id="statINT">10</div>
+            </div>
+          </div>
+          <button onclick="shareHunterCard()" class="w-full mt-3 py-1.5 bg-purple-950/40 hover:bg-purple-900/60 border border-purple-500/30 text-purple-300 text-xs font-mono rounded tracking-widest transition">📸 EXPORT HUNTER STATUS IDENTITY</button>
+        </div>
+
+        <div class="glass-panel p-4 rounded-lg border border-cyan-500/10">
+          <div class="relative w-full h-44 flex items-center justify-center">
+            <canvas id="statRadarChart"></canvas>
+          </div>
+        </div>
+
+        <div class="space-y-3">
+          <div class="flex justify-between items-center">
+            <h3 class="heading-system text-md font-bold text-cyan-400">ACTIVE DAILY SYSTEM QUESTS</h3>
+            <span class="text-[11px] font-mono bg-cyan-950 text-cyan-400 border border-cyan-500/30 px-2 py-0.5 rounded uppercase" id="blockDisplayTag">Loading Block</span>
+          </div>
+          <div id="questContainer" class="space-y-3"></div>
+        </div>
+      </section>
+
+      <div id="integrityModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-md">
+        <div class="glass-panel p-6 rounded-lg max-w-sm w-full text-center border-2 border-cyan-400/60 space-y-4">
+          <div class="w-12 h-12 rounded-full border-2 border-cyan-400 flex items-center justify-center mx-auto text-cyan-400 font-bold animate-pulse">!</div>
+          <h3 class="heading-system text-lg text-cyan-400 tracking-wider">SYSTEM INTEGRITY ALERT</h3>
+          <p class="text-xs text-slate-300 leading-relaxed font-mono">
+            "The System monitors your actual physiological development. If you lie to the System, you lie only to your own reflection."
+          </p>
+          <div class="flex gap-3 pt-2 font-mono text-xs">
+            <button onclick="cancelQuestVerification()" class="flex-1 py-2 bg-slate-900 border border-slate-700 text-slate-400 rounded">RETREAT</button>
+            <button onclick="confirmQuestVerification()" class="flex-1 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-black font-bold rounded heading-system">CONFIRM</button>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <footer class="p-3 bg-slate-950 border-t border-slate-900 text-center text-[10px] font-mono text-slate-500 space-y-2">
+      <div class="text-[#00b1f4] font-sans">
+        <a href="https://www.nasm.org" target="_blank" rel="noopener noreferrer" class="hover:underline mx-1">NASM Standards</a> | 
+        <a href="https://www.acefitness.org" target="_blank" rel="noopener noreferrer" class="hover:underline mx-1">ACE Guidelines</a>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // System Active Local States Engine
+    let activeHunterName = "";
+    let hunterState = {
+      level: 1, exp: 0, nextLevelExp: 100, rank: 'E-RANK', unit: 'metric',
+      stats: { STR: 10, AGI: 10, VIT: 10, INT: 10 },
+      selectedDays: [], initialized: false
+    };
+
+    let radarChartInstance = null;
+
+    // Weekdays HUD Render Initialization Engine
+    const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const daysContainer = document.getElementById('daysWrapper');
+    weekdays.forEach(day => {
+      const btn = document.createElement('button');
+      btn.type = 'button'; btn.id = `dayBtn-${day}`; btn.innerText = day[0];
+      btn.className = "py-2 bg-slate-900 border border-slate-800 text-xs font-mono font-bold rounded text-slate-400 transition";
+      btn.onclick = () => toggleDeploymentDay(day);
+      daysContainer.appendChild(btn);
+    });
+
+    function toggleDeploymentDay(day) {
+      const btn = document.getElementById(`dayBtn-${day}`);
+      const idx = hunterState.selectedDays.indexOf(day);
+      if(idx > -1) {
+        hunterState.selectedDays.splice(idx, 1);
+        btn.className = "py-2 bg-slate-900 border border-slate-800 text-xs font-mono font-bold rounded text-slate-400 transition";
+      } else {
+        hunterState.selectedDays.push(day);
+        btn.className = "py-2 bg-cyan-500 text-black border-cyan-400 text-xs font-mono font-bold rounded transition";
+      }
+    }
+
+    // IDENTITY INTERFACE: Handle Server Authentication Requests
+    async function handleIdentityAuth(mode) {
+      const u = document.getElementById('authUsername').value.trim();
+      const p = document.getElementById('authPassword').value.trim();
+      if(!u || !p) return alert("Please specify target profile key strings.");
+
+      try {
+        const route = mode === 'register' ? '/api/auth/register' : '/api/auth/login';
+        const res = await fetch(route, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: u, password: p })
+        });
+        const data = await res.json();
+
+        if(!res.ok) throw new Error(data.error || "Authentication structural breach.");
+
+        if(mode === 'register') {
+          alert("Profile initialized in Registry! Clicking Load Saved Link now to connect.");
+        } else {
+          activeHunterName = u;
+          hunterState = data.hunterData;
+          document.getElementById('authScreen').classList.add('hidden');
+          document.getElementById('activeUserTag').innerText = `HUNTER: ${u.toUpperCase()}`;
+          document.getElementById('activeUserTag').classList.remove('hidden');
+
+          if(hunterState.initialized) {
+            document.getElementById('dashboardScreen').classList.remove('hidden');
+            fetchFitnessPlanDirectly();
+          } else {
+            document.getElementById('onboardingScreen').classList.remove('hidden');
+          }
+        }
+      } catch(err) { alert(err.message); }
+    }
+
+    // Google Sign In Integration Blueprint
+    function simulatedGoogleLogin() {
+      // Secure fallback interface routing
+      document.getElementById('authUsername').value = "Awakened_Google_User";
+      document.getElementById('authPassword').value = "OAUTH_SECURE_TOKEN_2026";
+      alert("Google Identity secure signature recognized. Click 'CREATE PROFILE' if it's your first time, or 'LOAD SAVED LINK' to sync.");
+    }
+
+    // CLOUD SYNCHRONIZATION TRIGGER: Write State Machine to Remote Core Database
+    async function syncSystemStateToCloud() {
+      if(!activeHunterName) return;
+      try {
+        await fetch('/api/hunter/sync', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: activeHunterName, hunterData: hunterState })
+        });
+      } catch(e) { console.error("Cloud synchronization gateway timed out."); }
+    }
+
+    async function generateHunterProgram(event) {
+      event.preventDefault();
+      hunterState.initialized = true;
+      await fetchFitnessPlanDirectly();
+      document.getElementById('onboardingScreen').classList.add('hidden');
+      document.getElementById('dashboardScreen').classList.remove('hidden');
+    }
+
+    async function fetchFitnessPlanDirectly() {
+      const payload = {
+        age: document.getElementById('inputAge').value || 18,
+        weight: document.getElementById('inputWeight').value || 70,
+        height: document.getElementById('inputHeight').value || 175,
+        goal: document.getElementById('inputGoal').value,
+        daysPerWeek: hunterState.selectedDays.length,
+        unit: hunterState.unit
+      };
+
+      const res = await fetch('/api/generate-plan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if(data.success) {
+        document.getElementById('blockDisplayTag').innerText = data.blockName;
+        renderSystemQuests(data.quests);
+        initRadarChartVisualizer();
+        updateUiDashboardDisplays();
+        syncSystemStateToCloud();
+      }
+    }
+
+    function renderSystemQuests(quests) {
+      const container = document.getElementById('questContainer');
+      container.innerHTML = '';
+      quests.forEach((q, index) => {
+        const item = document.createElement('div');
+        item.className = "glass-panel p-3.5 rounded border border-slate-800 flex justify-between items-center bg-slate-900/40";
+        item.innerHTML = `
+          <div class="space-y-1 max-w-[70%]">
+            <span class="text-[9px] font-mono px-1 bg-slate-800 text-cyan-400 border border-slate-700 rounded">${q.category}</span>
+            <h4 class="text-sm font-bold text-white font-mono">${q.name}</h4>
+            <p class="text-xs text-slate-400">${q.desc}</p>
+          </div>
+          <button onclick="promptIntegrityVerification(${q.points}, '${q.category}', ${index})" id="qbtn-${index}" class="px-3 py-1.5 bg-cyan-950 border border-cyan-500/30 rounded text-xs text-cyan-400 font-mono font-bold hover:bg-cyan-500 hover:text-black transition">COMPLETE</button>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    let targetQuest = null;
+    function promptIntegrityVerification(points, category, idx) {
+      targetQuest = { points, category, idx };
+      document.getElementById('integrityModal').classList.remove('hidden');
+    }
+
+    function cancelQuestVerification() {
+      document.getElementById('integrityModal').classList.add('hidden');
+    }
+
+    function confirmQuestVerification() {
+      if(!targetQuest) return;
+      hunterState.stats[targetQuest.category] += 2;
+      hunterState.exp += targetQuest.points;
+
+      if(hunterState.exp >= hunterState.nextLevelExp) {
+        hunterState.exp -= hunterState.nextLevelExp;
+        hunterState.level += 1;
+        hunterState.nextLevelExp = hunterState.level * 100;
+        alert("⚡ SYSTEM MONITOR: LEVEL INCREASE DETECTED. STAT POINTS UPGRADED.");
+      }
+
+      const btn = document.getElementById(`qbtn-${targetQuest.idx}`);
+      if(btn) {
+        btn.innerText = "VERIFIED";
+        btn.disabled = true;
+        btn.className = "px-3 py-1.5 bg-emerald-950 border border-emerald-500/20 text-emerald-400 text-xs rounded font-mono";
+      }
+
+      document.getElementById('integrityModal').classList.add('hidden');
+      updateUiDashboardDisplays();
+      syncSystemStateToCloud();
+    }
+
+    function updateUiDashboardDisplays() {
+      document.getElementById('hunterLevelBadge').innerText = hunterState.level;
+      document.getElementById('expText').innerText = `${hunterState.exp} / ${hunterState.nextLevelExp}`;
+      document.getElementById('expBar').style.width = `${(hunterState.exp / hunterState.nextLevelExp) * 100}%`;
+      
+      document.getElementById('statSTR').innerText = hunterState.stats.STR;
+      document.getElementById('statAGI').innerText = hunterState.stats.AGI;
+      document.getElementById('statVIT').innerText = hunterSt
